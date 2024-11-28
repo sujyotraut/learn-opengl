@@ -1,0 +1,10 @@
+{
+    "cSpell.words": [
+        "GLFW",
+        "OPENGL",
+        "Wwindow"
+    ],
+    "files.associations": {
+        "iostream": "cpp"
+    }
+}

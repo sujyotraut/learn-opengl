@@ -58,65 +58,6 @@ int main() {
   // Set window resize callback
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-  float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f,
-    0.0f, 0.5f, 0.0f,
-  };
-
-  // Create & bind VAO (Vertex Array Object)
-  // It is required in OpenGL core profile.
-  // For OpenGL compatibility profile there is default VAO.
-  unsigned int VAO;
-  glGenVertexArrays(1, &VAO);
-  glBindVertexArray(VAO);
-
-  // Create & bind VBO (Vertex Buffer Object)
-  unsigned int VBO;
-  glGenBuffers(1, &VBO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-  // Store vertex data in currently bonded buffer (VBO)
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-  // Store attribute info and the bounded VBO (id/name) in a VAO.
-  // We can unbound VBO, since it's info is stored in VAO.
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
-
-#pragma region Shader
-  const char* vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-
-  unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  glCompileShader(vertexShader);
-
-  const char* fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\0";
-
-  unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragmentShader);
-
-  unsigned int shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
-  glUseProgram(shaderProgram);
-
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
-#pragma endregion
-
   while (!glfwWindowShouldClose(window)) {
     /* When an event occurs, GLFW stores it in an internal event queue.
      * `glfwPollEvents()` is used to process the events in the queue.
@@ -129,10 +70,6 @@ int main() {
 
     glClearColor(.196f, .196f, .196f, 1);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    // It will try to draw triangles by grouping the vertices in sets of 3, any extra vertices will be ignored.
-    // For example if the vertex buffer contains 4 vertices, last one is ignored
-    glDrawArrays(GL_TRIANGLES, 0, 3);
 
     /* In OpenGL, a window typically has two buffers: the front buffer and the back buffer.
      * The front buffer is the buffer that is currently being displayed on the screen.

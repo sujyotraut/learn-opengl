@@ -59,9 +59,14 @@ int main() {
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f,
-    0.0f, 0.5f, 0.0f,
+    // First triangle
+    -0.5f, -0.5f, 0.0f, // bottom left
+    0.5f, 0.5f, 0.0f, // top right
+    -0.5f, 0.5f, 0.0f, // top left
+    // Second triangle
+    -0.5f, -0.5f, 0.0f, // bottom left
+    0.5f, 0.5f, 0.0f, // top right
+    0.5f, -0.5f, 0.0f, // bottom right
   };
 
   // Create & bind VAO (Vertex Array Object)
@@ -132,7 +137,8 @@ int main() {
 
     // It will try to draw triangles by grouping the vertices in sets of 3, any extra vertices will be ignored.
     // For example if the vertex buffer contains 4 vertices, last one is ignored
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    unsigned int numberOfVertices = sizeof(vertices) / (3 * sizeof(float));
+    glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
 
     /* In OpenGL, a window typically has two buffers: the front buffer and the back buffer.
      * The front buffer is the buffer that is currently being displayed on the screen.

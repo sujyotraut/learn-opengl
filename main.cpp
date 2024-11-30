@@ -3,19 +3,18 @@
 #include <iostream>
 
 #include "shader.hpp"
+#include "stb_image.hpp"
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 const char* vertexShaderPath = "../../shaders/vertex_shader.glsl";
 const char* fragmentShaderPath = "../../shaders/fragment_shader.glsl";
+const char* imagePath0 = "../../images/container.png";
+const char* imagePath1 = "../../images/awesomeface.png";
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) { glViewport(0, 0, width, height); }
-
-void process_input(GLFWwindow* window) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, GLFW_TRUE);
-  }
-}
+void process_input(GLFWwindow* window);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+unsigned char* loadImage(const char* file_name, int* width, int* height);
 
 int main() {
 #pragma region Setup GLFW
@@ -66,51 +65,92 @@ int main() {
 
 #pragma region Setup VAO, VBO, EBO
   float vertices[] = {
-    // postion, color
-    -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // bottom left
-    0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,  // top right
-    -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,   // top left
-    0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,   // bottom right
+    // positions          // colors           // texture coords
+    0.5f,  0.5f, 0.0f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+    0.5f, -0.5f, 0.0f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
   };
 
   unsigned int indices[] = {
-    0, 1, 2,
-    0, 1, 3
+    0, 1, 3, // first triangle
+    1, 2, 3  // second triangle
   };
 
-  // Create & bind VAO (Vertex Array Object)
-  // It is required in OpenGL core profile.
+  // VAO is required in OpenGL core profile.
   // For OpenGL compatibility profile there is default VAO.
-  unsigned int VAO;
+  unsigned int VAO, VBO, EBO;
   glGenVertexArrays(1, &VAO);
-  glBindVertexArray(VAO);
-
-  // Create & bind VBO (Vertex Buffer Object)
-  unsigned int VBO;
   glGenBuffers(1, &VBO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-  // Crate & bind EBO (Element Array Buffer)
-  unsigned int EBO;
   glGenBuffers(1, &EBO);
+
+  glBindVertexArray(VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   // Store attribute info and the bounded VBO (id/name) in a VAO.
   // We can unbound VBO, since it's info is stored in VAO.
-  unsigned int stride = 6 * sizeof(float);
+  unsigned int stride = 8 * sizeof(float);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, 0);
   glEnableVertexAttribArray(0);
 
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
+
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
+  glEnableVertexAttribArray(2);
+
+  // Unbind buffers
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 #pragma endregion
 
-  // Create and use shader program
+#pragma region Setup Texture
+  stbi_set_flip_vertically_on_load(true);
+
+  unsigned int texture0, texture1;
+  glGenTextures(1, &texture0);
+  glGenTextures(1, &texture1);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texture0);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+  int width0, height0;
+  unsigned char* texture0Data = loadImage(imagePath0, &width0, &height0);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width0, height0, 0, GL_RGB, GL_UNSIGNED_BYTE, texture0Data);
+  glGenerateTextureMipmap(texture0);
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, texture1);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  int width1, height1;
+  unsigned char* texture1Data = loadImage(imagePath1, &width1, &height1);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width1, height1, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture1Data);
+  glGenerateTextureMipmap(texture1);
+
+  stbi_image_free(texture0Data);
+  stbi_image_free(texture1Data);
+#pragma endregion
+
+#pragma region Setup Shader
   Shader shader(vertexShaderPath, fragmentShaderPath);
+
   shader.use();
-  shader.setFloat("x", 1.0f);
+  shader.setInt("texture0", 0);
+  shader.setInt("texture1", 1);
+#pragma endregion
 
   while (!glfwWindowShouldClose(window)) {
     /* When an event occurs, GLFW stores it in an internal event queue.
@@ -130,6 +170,8 @@ int main() {
     // unsigned int numberOfVertices = sizeof(vertices) / (3 * sizeof(float));
     // glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
 
+    shader.use();
+    glBindVertexArray(VAO);
     unsigned int numberOfIndices = sizeof(indices) / sizeof(unsigned int);
     glDrawElements(GL_TRIANGLES, numberOfIndices, GL_UNSIGNED_INT, 0);
 
@@ -143,4 +185,25 @@ int main() {
 
   glfwTerminate();
   return 0;
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) { glViewport(0, 0, width, height); }
+
+void process_input(GLFWwindow* window) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    glfwSetWindowShouldClose(window, GLFW_TRUE);
+  }
+}
+
+unsigned char* loadImage(const char* file_name, int* width, int* height) {
+  int nrChannels;
+  unsigned char* textureData = stbi_load(file_name, width, height, &nrChannels, 0);
+
+  if (!textureData) {
+    std::cout << "Failed to load texture" << std::endl;
+    glfwTerminate();
+    return 0;
+  }
+
+  return textureData;
 }

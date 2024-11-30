@@ -1,10 +1,25 @@
 {
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        ".vscode": true,
+        "build": true,
+    },
     "cSpell.words": [
         "GLFW",
         "OPENGL",
+        "Programiv",
+        "Shaderiv",
         "Wwindow"
     ],
     "files.associations": {
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "fstream": "cpp",
+        "string": "cpp",
+        "sstream": "cpp"
     }
 }

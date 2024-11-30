@@ -24,9 +24,9 @@ int main() {
     return 0;
   }
 
-  // Use OpenGL 3.3
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  // Use OpenGL 4.5
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 
   /* OpenGL provides different profiles that define a set of features and capabilities.
    * The most common profiles are the core profile and the compatibility profile.
@@ -63,10 +63,11 @@ int main() {
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   float vertices[] = {
-    -0.5f, -0.5f, 0.0f, // bottom left
-    0.5f, 0.5f, 0.0f, // top right
-    -0.5f, 0.5f, 0.0f, // top left
-    0.5f, -0.5f, 0.0f, // bottom right
+    // postion, color
+    -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // bottom left
+    0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,  // top right
+    -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,   // top left
+    0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,   // bottom right
   };
 
   unsigned int indices[] = {
@@ -95,8 +96,12 @@ int main() {
 
   // Store attribute info and the bounded VBO (id/name) in a VAO.
   // We can unbound VBO, since it's info is stored in VAO.
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  unsigned int stride = 6 * sizeof(float);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
   glEnableVertexAttribArray(0);
+
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
 
   // Create and use shader program
   Shader shader(vertexShaderPath, fragmentShaderPath);

@@ -106,6 +106,7 @@ int main() {
   // Create and use shader program
   Shader shader(vertexShaderPath, fragmentShaderPath);
   shader.use();
+  shader.setFloat("x", 1.0f);
 
   while (!glfwWindowShouldClose(window)) {
     /* When an event occurs, GLFW stores it in an internal event queue.

@@ -59,14 +59,15 @@ int main() {
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   float vertices[] = {
-    // First triangle
     -0.5f, -0.5f, 0.0f, // bottom left
     0.5f, 0.5f, 0.0f, // top right
     -0.5f, 0.5f, 0.0f, // top left
-    // Second triangle
-    -0.5f, -0.5f, 0.0f, // bottom left
-    0.5f, 0.5f, 0.0f, // top right
     0.5f, -0.5f, 0.0f, // bottom right
+  };
+
+  unsigned int indices[] = {
+    0, 1, 2,
+    0, 1, 3
   };
 
   // Create & bind VAO (Vertex Array Object)
@@ -80,9 +81,13 @@ int main() {
   unsigned int VBO;
   glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-  // Store vertex data in currently bonded buffer (VBO)
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  // Crate & bind EBO (Element Array Buffer)
+  unsigned int EBO;
+  glGenBuffers(1, &EBO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   // Store attribute info and the bounded VBO (id/name) in a VAO.
   // We can unbound VBO, since it's info is stored in VAO.
@@ -137,8 +142,11 @@ int main() {
 
     // It will try to draw triangles by grouping the vertices in sets of 3, any extra vertices will be ignored.
     // For example if the vertex buffer contains 4 vertices, last one is ignored
-    unsigned int numberOfVertices = sizeof(vertices) / (3 * sizeof(float));
-    glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+    // unsigned int numberOfVertices = sizeof(vertices) / (3 * sizeof(float));
+    // glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+
+    unsigned int numberOfIndices = sizeof(indices) / sizeof(unsigned int);
+    glDrawElements(GL_TRIANGLES, numberOfIndices, GL_UNSIGNED_INT, 0);
 
     /* In OpenGL, a window typically has two buffers: the front buffer and the back buffer.
      * The front buffer is the buffer that is currently being displayed on the screen.

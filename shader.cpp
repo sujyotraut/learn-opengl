@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "shader.h"
+#include "shader.hpp"
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath) {
     std::string vertexCode, fragmentCode;

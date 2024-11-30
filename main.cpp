@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-#include "shader.h"
+#include "shader.hpp"
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -18,6 +18,7 @@ void process_input(GLFWwindow* window) {
 }
 
 int main() {
+#pragma region Setup GLFW
   // Initialize glfw
   if (!glfwInit()) {
     std::cout << "Failed to initialize glfw" << std::endl;
@@ -61,7 +62,9 @@ int main() {
 
   // Set window resize callback
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+#pragma endregion
 
+#pragma region Setup VAO, VBO, EBO
   float vertices[] = {
     // postion, color
     -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // bottom left
@@ -97,11 +100,12 @@ int main() {
   // Store attribute info and the bounded VBO (id/name) in a VAO.
   // We can unbound VBO, since it's info is stored in VAO.
   unsigned int stride = 6 * sizeof(float);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, 0);
   glEnableVertexAttribArray(0);
 
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
+#pragma endregion
 
   // Create and use shader program
   Shader shader(vertexShaderPath, fragmentShaderPath);

@@ -1,5 +1,4 @@
 #version 450 core
-in vec3 interpolated_color;
 in vec2 interpolated_texture_coordinates;
 
 out vec4 fragment_color;

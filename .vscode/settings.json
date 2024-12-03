@@ -17,7 +17,8 @@
         "Programiv",
         "Shaderiv",
         "stbi",
-        "Wwindow"
+        "Wwindow",
+        "xoffset"
     ],
     "files.associations": {
         "iostream": "cpp",
